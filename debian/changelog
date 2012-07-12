@@ -1,5 +1,11 @@
+play (1.2.5-1) unstable; urgency=low
+
+  * 1.2.5 release
+
+ -- Leonard Ehrenfried <leonard.ehrenfried@web.de>  Thu, 12 Jul 2012 09:37:03 +0000
+
 play (1.2.4-1) unstable; urgency=low
 
-  * 1.2.4 release 
+  * 1.2.4 release
 
  -- nicolas@lunatech.com <nicolas@lunatech.com>  Tue, 03 Jan 2012 15:21:37 +0100

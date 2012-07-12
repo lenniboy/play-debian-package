@@ -1,2 +1,7 @@
 *.log
 *.zip
+play/
+*.postinst
+*.prerm
+*.substvars
+files

@@ -1,0 +1,100 @@
+--- base.py.125	2012-10-10 10:30:03.000000000 +0200
++++ base.py	2012-10-10 10:30:54.000000000 +0200
+@@ -8,7 +8,6 @@
+ import urllib2
+ import webbrowser
+ import time
+-import signal
+ 
+ from play.utils import *
+ 
+@@ -120,27 +119,14 @@
+     print "~ Have fun!"
+     print "~"
+ 
+-process = None
+-
+-def handle_sigterm(signum, frame):
+-    global process
+-    if 'process' in globals():
+-        process.terminate()
+-        sys.exit(0)
+-
+ def run(app, args):
+-    global process
+     app.check()
+     
+     print "~ Ctrl+C to stop"
+     print "~ "
+     java_cmd = app.java_cmd(args)
+     try:
+-        process = subprocess.Popen (java_cmd, env=os.environ)
+-        signal.signal(signal.SIGTERM, handle_sigterm)
+-        return_code = process.wait()
+-        if 0 != return_code:
+-            sys.exit(return_code)
++        subprocess.call(java_cmd, env=os.environ)
+     except OSError:
+         print "Could not execute the java executable, please make sure the JAVA_HOME environment variable is set properly (the java executable should reside at JAVA_HOME/bin/java). "
+         sys.exit(-1)
+@@ -174,9 +160,7 @@
+     print "~ "
+ 
+     try:
+-        return_code = subprocess.call(java_cmd, env=os.environ)
+-        if 0 != return_code:
+-            sys.exit(return_code)
++        subprocess.call(java_cmd, env=os.environ)
+     except OSError:
+         print "Could not execute the java executable, please make sure the JAVA_HOME environment variable is set properly (the java executable should reside at JAVA_HOME/bin/java). "
+         sys.exit(-1)
+@@ -208,11 +192,6 @@
+     except Exception, e:
+         pass
+ 
+-    # Do not run the app if SSL is configured and no cert store is configured
+-    keystore = app.readConf('keystore.file')
+-    if protocol == 'https' and not keystore:
+-      print "https without keystore configured. play auto-test will fail. Exiting now."
+-      sys.exit(-1)
+     # Run app
+     test_result = os.path.join(app.path, 'test-result')
+     if os.path.exists(test_result):
+@@ -234,17 +213,13 @@
+         line = soutint.readline().strip()
+         if line:
+             print line
+-            if line.find('Go to ') > -1: # This line is written out by the test runner to system.out and is not log file dependent
++            if line.find('Listening for HTTP') > -1:
+                 soutint.close()
+                 break
+ 
+     # Run FirePhoque
+     print "~"
+ 
+-    headless_browser = ''
+-    if app.readConf('headlessBrowser'):
+-        headless_browser = app.readConf('headlessBrowser')
+-
+     fpcp = [os.path.join(app.play_env["basedir"], 'modules/testrunner/lib/play-testrunner.jar')]
+     fpcp_libs = os.path.join(app.play_env["basedir"], 'modules/testrunner/firephoque')
+     for jar in os.listdir(fpcp_libs):
+@@ -253,9 +228,7 @@
+     cp_args = ':'.join(fpcp)
+     if os.name == 'nt':
+         cp_args = ';'.join(fpcp)    
+-    java_cmd = [app.java_path(), '-classpath', cp_args, '-Dapplication.url=%s://localhost:%s' % (protocol, http_port), '-DheadlessBrowser=%s' % (headless_browser), 'play.modules.testrunner.FirePhoque']
+-    if protocol == 'https':
+-        java_cmd.insert(-1, '-Djavax.net.ssl.trustStore=' + app.readConf('keystore.file'))
++    java_cmd = [app.java_path(), '-classpath', cp_args, '-Dapplication.url=%s://localhost:%s' % (protocol, http_port), 'play.modules.testrunner.FirePhoque']
+     try:
+         subprocess.call(java_cmd, env=os.environ)
+     except OSError:
+@@ -266,6 +239,7 @@
+     time.sleep(1)
+     
+     # Kill if exists
++    http_port = app.readConf('http.port')
+     try:
+         proxy_handler = urllib2.ProxyHandler({})
+         opener = urllib2.build_opener(proxy_handler)

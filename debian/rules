@@ -33,6 +33,8 @@ override_dh_auto_install:
 	for m in crud docviewer grizzly secure testrunner; \
 	 do rsync -r --exclude play/play-${VERSION}/tmp play/play-${VERSION}/modules/$$m $(DEB_PATH)$(INSTALL_PATH)/modules ;\
 	done
+	#apply patch to avoid "Connection refused errors":
+	patch $(DEB_PATH)$(INSTALL_PATH)/framework/pym/play/commands/base.py < debian/base.py.patch
 	cp -r play/play-${VERSION}/documentation $(DEB_PATH)$(DOC_PATH)
 	ln -s $(DOC_PATH)/documentation $(DEB_PATH)$(INSTALL_PATH)
 	cp -r debian/id $(DEB_PATH)$(ETC_PATH)

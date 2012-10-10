@@ -17,17 +17,17 @@ SBIN_PATH=/usr/sbin
 %:
 	dh  $@
 
-override_dh_auto_build: 
+override_dh_auto_build:
 	if [ ! -f play-${VERSION}.zip ]; then curl -o play-${VERSION}.zip http://download.playframework.org/releases/play-${VERSION}.zip;fi
 	unzip play-${VERSION}.zip -d play
 
 
-override_dh_auto_clean: 
+override_dh_auto_clean:
 	if [ -f play-${VERSION}.zip ]; then rm play-${VERSION}.zip; fi
-	if [ -d play ]; then rm -rf play; fi 
-	if [ -d ${DEB_PATH} ]; then rm -rf ${DEB_PATH}; fi		
+	if [ -d play ]; then rm -rf play; fi
+	if [ -d ${DEB_PATH} ]; then rm -rf ${DEB_PATH}; fi
 
-override_dh_auto_install: 
+override_dh_auto_install:
 	install -d $(DEB_PATH)$(INSTALL_PATH) $(DEB_PATH)$(SBIN_PATH) $(DEB_PATH)$(INSTALL_PATH)/modules $(DEB_PATH)$(ETC_PATH) $(DEB_PATH)$(DOC_PATH)
 	rsync -r --exclude play/play-${VERSION}/framework/classes play/play-${VERSION}/framework play/play-${VERSION}/play play/play-${VERSION}/resources play/play-${VERSION}/support play/play-${VERSION}/samples-and-tests $(DEB_PATH)$(INSTALL_PATH)
 	for m in crud docviewer grizzly secure testrunner; \

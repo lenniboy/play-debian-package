@@ -1,3 +1,9 @@
+play (1.2.5-3) precise; urgency=low
+
+  * Revert patch which breaks CI autotest
+
+ -- Leonard Ehrenfried <leonard.ehrenfried@web.de>  Wed, 10 Oct 2012 11:36:36 +0000
+
 play (1.2.5-1) unstable; urgency=low
 
   * 1.2.5 release
